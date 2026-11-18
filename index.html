@@ -53,6 +53,7 @@
       <p>Température, humidité, pression et prévisions météo.</p>
       <p>🌡️ Température : <strong id="temperature">Chargement...</strong></p>
 <p>💧 Humidité : <strong id="humidite">Chargement...</strong></p>
+      <p>🌤️ Pression : <strong id="pression">Chargement...</strong></p>
     </div>
 
     <div class="carte">
@@ -85,7 +86,8 @@ async function actualiserMeteo() {
 
   await Promise.all([
     lireMesure("temperature", "temperature", "°C"),
-    lireMesure("humidite", "humidite", "%")
+    lireMesure("humidite", "humidite", "%"),
+lireMesure("pression", "pression", "hPa")
   ]);
 }
 
