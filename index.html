@@ -55,6 +55,7 @@
 <p>💧 Humidité : <strong id="humidite">Chargement...</strong></p>
       <p>🌤️ Pression : <strong id="pression">Chargement...</strong></p>
       <p>💨 Vent prévu : <strong id="vent">Chargement...</strong></p>
+      <p>☀️ État du ciel : <strong id="ciel">Chargement...</strong></p>
 <p>🌧️ Précipitations récentes : <strong id="pluie">Chargement...</strong></p>
       <p>🕒 Dernière actualisation : <strong id="heure">Chargement...</strong></p>
         </div>
@@ -115,7 +116,29 @@ lireMesure("pression", "pression", "hPa")
    } catch (erreur) {
     document.getElementById("pluie").textContent = "Indisponible";
   }
+  try {
+    const reponseCiel = await fetch(
+      "https://api.open-meteo.com/v1/forecast?latitude=50.18&longitude=3.22&current=weather_code"
+    );
+    if (!reponseCiel.ok) throw new Error("Ciel indisponible");
 
+    const donneesCiel = await reponseCiel.json();
+    const codeCiel = donneesCiel.current.weather_code;
+
+    let etatCiel = "🌤️ Variable";
+    if (codeCiel === 0) etatCiel = "☀️ Ciel dégagé";
+    else if (codeCiel <= 3) etatCiel = "☁️ Nuageux";
+    else if (codeCiel <= 48) etatCiel = "🌫️ Brouillard";
+    else if (codeCiel <= 67) etatCiel = "🌧️ Pluie";
+    else if (codeCiel <= 77) etatCiel = "❄️ Neige";
+    else if (codeCiel <= 82) etatCiel = "🌦️ Averses";
+    else if (codeCiel <= 86) etatCiel = "🌨️ Neige";
+    else if (codeCiel >= 95) etatCiel = "⛈️ Orage";
+
+    document.getElementById("ciel").textContent = etatCiel;
+  } catch (erreur) {
+    document.getElementById("ciel").textContent = "Indisponible";
+  }
   document.getElementById("heure").textContent =
     new Date().toLocaleTimeString("fr-FR");
 }
