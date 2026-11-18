@@ -55,8 +55,8 @@
 <p>💧 Humidité : <strong id="humidite">Chargement...</strong></p>
       <p>🌤️ Pression : <strong id="pression">Chargement...</strong></p>
       <p>💨 Vent prévu : <strong id="vent">Chargement...</strong></p>
-    </div>
-
+<p>🌧️ Pluie prévue : <strong id="pluie">Chargement...</strong></p>
+        </div>
     <div class="carte">
       <h2>❤️ Soutenir la station météo</h2>
       <p>Aidez-nous à maintenir ce service gratuit.</p>
@@ -100,7 +100,19 @@ lireMesure("pression", "pression", "hPa")
     document.getElementById("vent").textContent =
       donneesVent.current.wind_speed_10m + " km/h";
   } catch (erreur) {
-    document.getElementById("vent").textContent = "Indisponible";
+  document.getElementById("vent").textContent = "Indisponible";
+}
+      try {
+    const reponsePluie = await fetch(
+      "https://api.open-meteo.com/v1/forecast?latitude=50.18&longitude=3.22&current=precipitation"
+    );
+    if (!reponsePluie.ok) throw new Error("Pluie indisponible");
+
+    const donneesPluie = await reponsePluie.json();
+    document.getElementById("pluie").textContent =
+      donneesPluie.current.precipitation + " mm";
+  } catch (erreur) {
+    document.getElementById("pluie").textContent = "Indisponible";
   }
 }
 
