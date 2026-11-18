@@ -56,6 +56,7 @@
       <p>🌤️ Pression : <strong id="pression">Chargement...</strong></p>
       <p>💨 Vent prévu : <strong id="vent">Chargement...</strong></p>
 <p>🌧️ Précipitations récentes : <strong id="pluie">Chargement...</strong></p>
+      <p>🕒 Dernière actualisation : <strong id="heure">Chargement...</strong></p>
         </div>
     <div class="carte">
       <h2>❤️ Soutenir la station météo</h2>
@@ -111,9 +112,12 @@ lireMesure("pression", "pression", "hPa")
     const donneesPluie = await reponsePluie.json();
     document.getElementById("pluie").textContent =
       donneesPluie.current.precipitation + " mm";
-  } catch (erreur) {
+   } catch (erreur) {
     document.getElementById("pluie").textContent = "Indisponible";
   }
+
+  document.getElementById("heure").textContent =
+    new Date().toLocaleTimeString("fr-FR");
 }
 
 actualiserMeteo();
