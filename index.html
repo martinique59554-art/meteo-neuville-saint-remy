@@ -51,7 +51,8 @@
     <div class="carte">
       <h2>Bienvenue sur notre station météo !</h2>
       <p>Température, humidité, pression et prévisions météo.</p>
-      <p>Les mesures en direct seront bientôt disponibles.</p>
+      <p>🌡️ Température : <strong id="temperature">Chargement...</strong></p>
+<p>💧 Humidité : <strong id="humidite">Chargement...</strong></p>
     </div>
 
     <div class="carte">
@@ -61,5 +62,35 @@
       <p>Le bouton de paiement sera ajouté prochainement.</p>
     </div>
   </main>
+  
+<script>
+async function actualiserMeteo() {
+  const utilisateur = "chevallier5959";
+
+  async function lireMesure(flux, element, unite) {
+    try {
+      const url = `https://io.adafruit.com/api/v2/${utilisateur}/feeds/${flux}/data/last`;
+      const reponse = await fetch(url);
+
+      if (!reponse.ok) throw new Error("Lecture impossible");
+
+      const donnee = await reponse.json();
+      document.getElementById(element).textContent =
+        donnee.value + " " + unite;
+    } catch (erreur) {
+      document.getElementById(element).textContent =
+        "Indisponible";
+    }
+  }
+
+  await Promise.all([
+    lireMesure("temperature", "temperature", "°C"),
+    lireMesure("humidite", "humidite", "%")
+  ]);
+}
+
+actualiserMeteo();
+setInterval(actualiserMeteo, 60000);
+</script>
 </body>
 </html>
