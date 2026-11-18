@@ -54,6 +54,7 @@
       <p>🌡️ Température : <strong id="temperature">Chargement...</strong></p>
 <p>💧 Humidité : <strong id="humidite">Chargement...</strong></p>
       <p>🌤️ Pression : <strong id="pression">Chargement...</strong></p>
+      <p>💨 Vent prévu : <strong id="vent">Chargement...</strong></p>
     </div>
 
     <div class="carte">
@@ -89,6 +90,18 @@ async function actualiserMeteo() {
     lireMesure("humidite", "humidite", "%"),
 lireMesure("pression", "pression", "hPa")
   ]);
+    try {
+    const reponseVent = await fetch(
+      "https://api.open-meteo.com/v1/forecast?latitude=50.18&longitude=3.22&current=wind_speed_10m&wind_speed_unit=kmh"
+    );
+    if (!reponseVent.ok) throw new Error("Vent indisponible");
+
+    const donneesVent = await reponseVent.json();
+    document.getElementById("vent").textContent =
+      donneesVent.current.wind_speed_10m + " km/h";
+  } catch (erreur) {
+    document.getElementById("vent").textContent = "Indisponible";
+  }
 }
 
 actualiserMeteo();
