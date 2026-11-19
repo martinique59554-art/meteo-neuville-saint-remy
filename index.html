@@ -5,102 +5,150 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>🎄 Météo Neuville-Saint-Rémy</title>
-
 <style>
+* { box-sizing: border-box; }
 body {
-  font-family: Arial, sans-serif;
   margin: 0;
-  min-height: 100vh;
-  background: linear-gradient(180deg,#173b70,#87ceeb,#eaf5ff);
+  font-family: Arial, sans-serif;
   color: #18334b;
   text-align: center;
+  background: linear-gradient(#16345f,#4879a7,#dcefff);
+  min-height: 100vh;
   overflow-x: hidden;
 }
 header {
-  background: #1674bc;
+  background: #176cb1;
   color: white;
-  padding: 35px 15px;
+  padding: 24px 12px;
 }
 main {
-  max-width: 650px;
-  margin: 25px auto;
-  padding: 15px;
+  max-width: 690px;
+  margin: 20px auto;
+  padding: 12px;
   position: relative;
   z-index: 2;
 }
 .carte {
   background: rgba(255,255,255,.96);
+  padding: 22px;
   border-radius: 18px;
-  padding: 25px;
-  margin-bottom: 20px;
-  box-shadow: 0 3px 12px #00000018;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 15px #0002;
 }
+.carte p { line-height: 1.6; }
+.carte h2 { margin-top: 0; }
 .bouton {
   display: inline-block;
   background: #e86b83;
   color: white;
-  padding: 15px 25px;
-  border-radius: 30px;
-  font-weight: bold;
   text-decoration: none;
+  font-weight: bold;
+  padding: 13px 20px;
+  border-radius: 25px;
+  margin: 6px;
 }
+.bouton.bleu { background: #1674bc; }
 .maintenance {
   background: #fff3cd;
   color: #664d03;
-  padding: 15px;
+  padding: 12px;
 }
-.noel-titre {
+.maintenance h2 { margin: 6px; }
+.petit { font-size: 13px; color: #555; }
+.grand {
+  font-size: 24px;
+  font-weight: bold;
+  color: #125da0;
+}
+.pluie-carte { border: 3px solid #438ed1; }
+.danger-carte { border: 2px solid #e4a54f; }
+#seismes { text-align: left; }
+.seisme {
+  border-bottom: 1px solid #ddd;
+  padding: 12px 0;
+}
+.seisme:last-child { border-bottom: 0; }
+
+/* Village de Noël */
+.village {
+  position: relative;
+  height: 185px;
+  overflow: hidden;
+  background: linear-gradient(#122a50,#3e6591);
   color: white;
-  text-shadow: 2px 2px 5px #18334b;
-  padding: 15px;
+}
+.village-titre {
+  position: relative;
+  z-index: 2;
+  margin: 8px 0;
+  text-shadow: 1px 2px 5px #000;
+}
+.lune-noel {
+  position: absolute;
+  top: 10px;
+  right: 14%;
+  font-size: 36px;
+}
+.village-sol {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 18px;
+  background: #fff;
+  border-radius: 50% 50% 0 0;
+}
+.maisons {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: flex-end;
+  font-size: clamp(30px,6vw,56px);
+  z-index: 1;
+}
+.maisons span {
+  filter: drop-shadow(0 0 8px #ffd878);
 }
 .traineau {
-  position: fixed;
-  top: 65px;
+  position: absolute;
+  top: 50px;
   left: 0;
-  font-size: 45px;
   white-space: nowrap;
-  z-index: 5;
-  pointer-events: none;
-  animation: voler 18s linear infinite;
+  font-size: 37px;
+  z-index: 4;
+  animation: voler 17s linear infinite;
 }
 @keyframes voler {
-  from { transform: translateX(-300px); }
+  from { transform: translateX(-250px); }
   to { transform: translateX(110vw); }
 }
 .sapin-gauche,.sapin-droite {
   position: fixed;
-  bottom: 10px;
-  font-size: 65px;
+  bottom: 12px;
+  font-size: 52px;
   z-index: 3;
   pointer-events: none;
 }
-.sapin-gauche { left: 5px; }
-.sapin-droite { right: 5px; }
+.sapin-gauche { left: 3px; }
+.sapin-droite { right: 3px; }
 .flocon {
   position: fixed;
-  top: -50px;
+  top: -35px;
   color: white;
-  text-shadow: 0 0 4px #4477aa;
+  text-shadow: 0 0 3px #3572a1;
   pointer-events: none;
-  z-index: 4;
+  z-index: 5;
   animation: tomber linear infinite;
 }
 @keyframes tomber {
-  from { transform: translateY(-50px) rotate(0deg); }
+  from { transform: translateY(-40px) rotate(0); }
   to { transform: translateY(110vh) rotate(360deg); }
 }
-.alerte {
-  background: #fff1e6;
-  border: 2px solid #e5a65d;
-}
-.petit {
-  font-size: 13px;
-  color: #555;
-}
 footer {
-  padding: 20px;
   color: white;
+  padding: 20px;
   font-weight: bold;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -112,15 +160,25 @@ footer {
 
 <body>
 
-<div class="traineau">🦌🦌🛷🎅</div>
+<div class="village">
+  <h2 class="village-titre">🎄 Joyeux Noël à Neuville-Saint-Rémy ! 🎄</h2>
+  <div class="lune-noel">🌟</div>
+  <div class="traineau">🦌🦌🛷🎅</div>
+  <div class="maisons">
+    <span>🎄</span>
+    <span>🏠</span>
+    <span>🏡</span>
+    <span>🎄</span>
+    <span>🏠</span>
+    <span>🏡</span>
+    <span>🎄</span>
+  </div>
+  <div class="village-sol"></div>
+</div>
+
 <div class="sapin-gauche">🎄</div>
 <div class="sapin-droite">🎄</div>
 <div id="neige"></div>
-
-<div class="noel-titre">
-  <h2>🎄 Joyeux Noël à Neuville-Saint-Rémy ! 🎅</h2>
-  <p>❄️ La magie de Noël arrive sur notre station météo ❄️</p>
-</div>
 
 <div class="maintenance">
   <h2>🚧 STATION MÉTÉO EN MAINTENANCE 🚧</h2>
@@ -135,96 +193,133 @@ footer {
 
 <main>
 
-<div class="carte">
+<section class="carte">
   <h2>🌡️ Notre station météo</h2>
   <p>🌡️ Température : <strong id="temperature">Chargement...</strong></p>
   <p>💧 Humidité : <strong id="humidite">Chargement...</strong></p>
   <p>🌤️ Pression : <strong id="pression">Chargement...</strong></p>
-  <p>💨 Vent prévu : <strong id="vent">Chargement...</strong></p>
+  <p>💨 Vent : <strong id="vent">Chargement...</strong></p>
   <p>☀️ État du ciel : <strong id="ciel">Chargement...</strong></p>
-  <p>🌧️ Précipitations récentes : <strong id="pluie">Chargement...</strong></p>
-  <p>🕒 Dernière actualisation : <strong id="heure">Chargement...</strong></p>
-</div>
+  <p>🌧️ Précipitations récentes :
+    <strong id="pluie">Chargement...</strong>
+  </p>
+  <p>🕒 Dernière actualisation :
+    <strong id="heure">Chargement...</strong>
+  </p>
+</section>
 
-<div class="carte alerte">
+<section class="carte pluie-carte">
+  <h2>☔ Dans combien de temps va-t-il pleuvoir ?</h2>
+  <p class="grand" id="pluie-arrivee">Chargement...</p>
+  <p id="pluie-horaire"></p>
+  <p class="petit">
+    Estimation par tranches de 15 minutes sur les 6 prochaines heures.
+    Une averse peut arriver plus tôt ou plus tard.
+  </p>
+</section>
+
+<section class="carte danger-carte">
   <h2>🌪️ Vigilance météo et tornades</h2>
-  <p>⚠️ Consultez les alertes officielles pour le département du Nord (59).</p>
-  <p>Orages violents, vents forts et phénomènes dangereux.</p>
-  <a class="bouton"
-     href="https://vigilance.meteofrance.fr/fr/nord"
-     target="_blank"
-     rel="noopener noreferrer">
-    🚨 Voir la vigilance officielle
+  <p>Consultez les vigilances officielles du Nord (59) :
+  orages, vents violents et autres phénomènes dangereux.</p>
+  <a class="bouton" href="https://vigilance.meteofrance.fr/fr/nord"
+     target="_blank" rel="noopener noreferrer">
+    🚨 Vigilance Météo-France
   </a>
   <p class="petit">
-    Cette rubrique ne détecte pas les tornades en direct.
-    Consultez Météo-France pour connaître les vigilances en vigueur.
+    Ce site ne détecte pas les tornades et ne remplace pas
+    les alertes des autorités.
   </p>
-</div>
+</section>
 
-<div class="carte">
+<section class="carte danger-carte">
+  <h2>🌊 Risques d'inondation et de crues</h2>
+  <p>Surveillez la vigilance des cours d'eau et les risques
+  d'inondation dans notre région.</p>
+  <a class="bouton bleu" href="https://www.vigicrues.gouv.fr/"
+     target="_blank" rel="noopener noreferrer">
+    🌊 Consulter Vigicrues
+  </a>
+  <a class="bouton bleu"
+     href="https://vigilance.meteofrance.fr/fr/nord"
+     target="_blank" rel="noopener noreferrer">
+    🌧️ Vigilance pluie-inondation
+  </a>
+  <p class="petit">
+    Vigicrues couvre les principaux cours d'eau surveillés,
+    pas toutes les inondations locales.
+  </p>
+</section>
+
+<section class="carte">
+  <h2>🌍 Tremblements de terre récents</h2>
+  <p>Derniers séismes enregistrés dans un rayon de
+  300 km autour de Neuville-Saint-Rémy, sur 30 jours.</p>
+  <div id="seismes">Recherche en cours...</div>
+  <p class="petit">
+    Source : USGS. Les événements peuvent être ajoutés
+    ou révisés après leur survenue.
+  </p>
+  <a class="bouton bleu"
+     href="https://earthquake.usgs.gov/earthquakes/map/"
+     target="_blank" rel="noopener noreferrer">
+    🌍 Carte des séismes
+  </a>
+</section>
+
+<section class="carte">
   <h2>☀️ Soleil et indice UV</h2>
-  <p>🌅 Lever du soleil : <strong id="soleil-lever">Chargement...</strong></p>
-  <p>🌇 Coucher du soleil : <strong id="soleil-coucher">Chargement...</strong></p>
-  <p>☀️ Indice UV maximal prévu aujourd'hui :
+  <p>🌅 Lever du soleil :
+    <strong id="soleil-lever">Chargement...</strong>
+  </p>
+  <p>🌇 Coucher du soleil :
+    <strong id="soleil-coucher">Chargement...</strong>
+  </p>
+  <p>☀️ Indice UV maximal prévu :
     <strong id="uv">Chargement...</strong>
   </p>
-  <p class="petit">Prévisions Open-Meteo, heures locales.</p>
-</div>
+</section>
 
-<div class="carte">
+<section class="carte">
   <h2>🌙 La Lune aujourd'hui</h2>
-  <p>🌙 Phase : <strong id="lune-phase">Chargement...</strong></p>
-  <p>✨ Éclairage : <strong id="lune-eclairage">Chargement...</strong></p>
-  <p>🌔 Lever de la Lune :
+  <p>🌙 Phase :
+    <strong id="lune-phase">Chargement...</strong>
+  </p>
+  <p>✨ Éclairage :
+    <strong id="lune-eclairage">Chargement...</strong>
+  </p>
+  <p>🌔 Lever :
     <strong id="lune-lever">Chargement...</strong>
   </p>
-  <p>🌘 Coucher de la Lune :
+  <p>🌘 Coucher :
     <strong id="lune-coucher">Chargement...</strong>
   </p>
   <p class="petit">Calculs astronomiques approximatifs.</p>
-</div>
+</section>
 
-<div class="carte">
+<section class="carte">
   <h2>❤️ Soutenir la station météo</h2>
   <p>Aidez-nous à maintenir ce service gratuit.</p>
   <p>Don volontaire : 2 €</p>
   <a class="bouton"
      href="https://paypal.me/ReneChevallier/2EUR"
-     target="_blank"
-     rel="noopener noreferrer">
+     target="_blank" rel="noopener noreferrer">
     💙 Faire un don de 2 € avec PayPal
   </a>
-</div>
+</section>
 
 </main>
 
-<footer>
-  🎄 Joyeuses fêtes de fin d'année ! 🎁
-</footer>
+<footer>🎅🎄 Joyeuses fêtes de fin d'année ! ❄️🎁</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.js"></script>
-
 <script>
-// Décorations de Noël
-const neige = document.getElementById("neige");
-for (let i = 0; i < 35; i++) {
-  const flocon = document.createElement("span");
-  flocon.className = "flocon";
-  flocon.textContent = "❄";
-  flocon.style.left = Math.random() * 100 + "vw";
-  flocon.style.fontSize = (12 + Math.random() * 20) + "px";
-  flocon.style.animationDuration = (7 + Math.random() * 10) + "s";
-  flocon.style.animationDelay = (-Math.random() * 17) + "s";
-  neige.appendChild(flocon);
-}
-
 const latitude = 50.18;
 const longitude = 3.22;
 const fuseau = "Europe/Paris";
 
-function afficher(id, valeur) {
-  document.getElementById(id).textContent = valeur;
+function afficher(id, texte) {
+  document.getElementById(id).textContent = texte;
 }
 
 function heureLocale(date) {
@@ -238,20 +333,37 @@ function heureLocale(date) {
   }).format(date);
 }
 
-// Mesures de l'ESP32
-async function lireMesure(flux, element, unite) {
+// Neige animée
+const neige = document.getElementById("neige");
+for (let i = 0; i < 35; i++) {
+  const flocon = document.createElement("span");
+  flocon.className = "flocon";
+  flocon.textContent = "❄";
+  flocon.style.left = Math.random() * 100 + "vw";
+  flocon.style.fontSize = (12 + Math.random() * 20) + "px";
+  flocon.style.animationDuration =
+    (7 + Math.random() * 10) + "s";
+  flocon.style.animationDelay =
+    (-Math.random() * 17) + "s";
+  neige.appendChild(flocon);
+}
+
+// Mesures ESP32 / Adafruit IO
+async function lireMesure(flux, id, unite) {
   try {
-    const url = `https://io.adafruit.com/api/v2/chevallier5959/feeds/${flux}/data/last`;
+    const url =
+      "https://io.adafruit.com/api/v2/chevallier5959/feeds/" +
+      flux + "/data/last";
     const reponse = await fetch(url);
     if (!reponse.ok) throw new Error("Lecture impossible");
     const donnee = await reponse.json();
-    afficher(element, donnee.value + " " + unite);
-  } catch (erreur) {
-    afficher(element, "Indisponible");
+    afficher(id, donnee.value + " " + unite);
+  } catch {
+    afficher(id, "Indisponible");
   }
 }
 
-// Prévisions météo et données solaires
+// Météo générale, soleil et UV
 async function lirePrevisions() {
   try {
     const url =
@@ -262,16 +374,15 @@ async function lirePrevisions() {
       "&timezone=Europe%2FParis";
 
     const reponse = await fetch(url);
-    if (!reponse.ok) throw new Error("API indisponible");
+    if (!reponse.ok) throw new Error("Prévision indisponible");
     const donnees = await reponse.json();
 
-    const actuel = donnees.current;
-    const jour = donnees.daily;
+    afficher("vent",
+      donnees.current.wind_speed_10m + " km/h");
+    afficher("pluie",
+      donnees.current.precipitation + " mm");
 
-    afficher("vent", actuel.wind_speed_10m + " km/h");
-    afficher("pluie", actuel.precipitation + " mm");
-
-    const code = actuel.weather_code;
+    const code = donnees.current.weather_code;
     let ciel = "🌤️ Variable";
 
     if (code === 0) ciel = "☀️ Ciel dégagé";
@@ -284,12 +395,12 @@ async function lirePrevisions() {
     else if (code >= 95) ciel = "⛈️ Orage";
 
     afficher("ciel", ciel);
+    afficher("soleil-lever",
+      donnees.daily.sunrise[0].slice(11,16));
+    afficher("soleil-coucher",
+      donnees.daily.sunset[0].slice(11,16));
 
-    // Les horaires fournis sont déjà en heure locale.
-    afficher("soleil-lever", jour.sunrise[0].slice(11, 16));
-    afficher("soleil-coucher", jour.sunset[0].slice(11, 16));
-
-    const uv = jour.uv_index_max[0];
+    const uv = donnees.daily.uv_index_max[0];
     let niveau = "Faible";
     if (uv >= 11) niveau = "Extrême";
     else if (uv >= 8) niveau = "Très élevé";
@@ -297,95 +408,226 @@ async function lirePrevisions() {
     else if (uv >= 3) niveau = "Modéré";
 
     afficher("uv", uv + " — " + niveau);
-
-  } catch (erreur) {
+  } catch {
     ["vent","pluie","ciel","soleil-lever",
-     "soleil-coucher","uv"].forEach(id => {
-      afficher(id, "Indisponible");
-    });
+     "soleil-coucher","uv"].forEach(id =>
+      afficher(id, "Indisponible")
+    );
   }
 }
 
-// Phase et horaires de la Lune
+// Arrivée de la pluie : tranches de 15 minutes
+async function lireArriveePluie() {
+  try {
+    const url =
+      "https://api.open-meteo.com/v1/forecast" +
+      "?latitude=50.18&longitude=3.22" +
+      "&minutely_15=rain" +
+      "&forecast_minutely_15=28" +
+      "&timeformat=unixtime" +
+      "&timezone=Europe%2FParis";
+
+    const reponse = await fetch(url);
+    if (!reponse.ok) throw new Error("Données indisponibles");
+    const donnees = await reponse.json();
+    const heures = donnees.minutely_15.time;
+    const valeurs = donnees.minutely_15.rain;
+
+    const maintenant = Date.now();
+    const fin = maintenant + 6 * 3600000;
+    let debut = null;
+    let enCours = false;
+
+    for (let i = 0; i < heures.length; i++) {
+      const instant = heures[i] * 1000;
+      const pluie = valeurs[i];
+
+      if (instant > fin) break;
+      if (pluie === null || pluie < 0.1) continue;
+
+      if (instant <= maintenant &&
+          instant + 900000 > maintenant) {
+        enCours = true;
+        break;
+      }
+
+      if (instant > maintenant) {
+        debut = instant;
+        break;
+      }
+    }
+
+    if (enCours) {
+      afficher("pluie-arrivee",
+        "🌧️ Pluie prévue actuellement");
+      afficher("pluie-horaire",
+        "Pense au parapluie ! ☂️");
+    } else if (debut !== null) {
+      const minutes =
+        Math.max(0,Math.round((debut - maintenant)/60000));
+      const h = Math.floor(minutes / 60);
+      const m = minutes % 60;
+      const delai = h > 0
+        ? h + " h " + String(m).padStart(2,"0")
+        : minutes + " minutes";
+
+      afficher("pluie-arrivee",
+        "☔ Pluie prévue dans " + delai);
+      afficher("pluie-horaire",
+        "Vers " + heureLocale(new Date(debut)));
+    } else {
+      afficher("pluie-arrivee",
+        "🌤️ Pas de pluie prévue dans les 6 prochaines heures");
+      afficher("pluie-horaire",
+        "Selon les prévisions disponibles.");
+    }
+  } catch {
+    afficher("pluie-arrivee",
+      "Prévision indisponible");
+    afficher("pluie-horaire",
+      "Réessaie dans quelques minutes.");
+  }
+}
+
+// Séismes récents autour de Neuville-Saint-Rémy
+async function lireSeismes() {
+  const zone = document.getElementById("seismes");
+  try {
+    const debut = new Date(Date.now() - 30 * 86400000)
+      .toISOString().slice(0,10);
+
+    const url =
+      "https://earthquake.usgs.gov/fdsnws/event/1/query" +
+      "?format=geojson" +
+      "&latitude=50.18&longitude=3.22" +
+      "&maxradiuskm=300" +
+      "&starttime=" + debut +
+      "&orderby=time&limit=5";
+
+    const reponse = await fetch(url);
+    if (!reponse.ok) throw new Error("Service indisponible");
+    const donnees = await reponse.json();
+    zone.replaceChildren();
+
+    if (!donnees.features || !donnees.features.length) {
+      zone.textContent =
+        "Aucun séisme répertorié dans cette zone sur 30 jours.";
+      return;
+    }
+
+    donnees.features.forEach(evenement => {
+      const p = evenement.properties;
+      const ligne = document.createElement("div");
+      ligne.className = "seisme";
+
+      const titre = document.createElement("strong");
+      titre.textContent =
+        "🌍 Magnitude " +
+        (p.mag === null ? "inconnue" : p.mag);
+
+      const lieu = document.createElement("p");
+      lieu.textContent = p.place || "Lieu non précisé";
+
+      const date = document.createElement("small");
+      date.textContent =
+        new Date(p.time).toLocaleString("fr-FR", {
+          timeZone: fuseau
+        });
+
+      ligne.append(titre, lieu, date);
+
+      if (p.url && p.url.startsWith("https://earthquake.usgs.gov/")) {
+        const lien = document.createElement("p");
+        const a = document.createElement("a");
+        a.href = p.url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.textContent = "Détails du séisme";
+        lien.appendChild(a);
+        ligne.appendChild(lien);
+      }
+
+      zone.appendChild(ligne);
+    });
+  } catch {
+    zone.textContent =
+      "Données sismiques indisponibles pour le moment.";
+  }
+}
+
+// Lune
 function lireLune() {
   if (typeof SunCalc === "undefined") {
     ["lune-phase","lune-eclairage",
-     "lune-lever","lune-coucher"].forEach(id => {
-      afficher(id, "Indisponible");
-    });
+     "lune-lever","lune-coucher"].forEach(id =>
+      afficher(id,"Indisponible")
+    );
     return;
   }
 
   const maintenant = new Date();
-  const illumination = SunCalc.getMoonIllumination(maintenant);
-  const phase = illumination.phase;
+  const info = SunCalc.getMoonIllumination(maintenant);
+  const p = info.phase;
 
-  let nomPhase = "🌙 Nouvelle lune";
-  if (phase < 0.03 || phase >= 0.97)
-    nomPhase = "🌑 Nouvelle lune";
-  else if (phase < 0.22)
-    nomPhase = "🌒 Premier croissant";
-  else if (phase < 0.28)
-    nomPhase = "🌓 Premier quartier";
-  else if (phase < 0.47)
-    nomPhase = "🌔 Lune gibbeuse croissante";
-  else if (phase < 0.53)
-    nomPhase = "🌕 Pleine lune";
-  else if (phase < 0.72)
-    nomPhase = "🌖 Lune gibbeuse décroissante";
-  else if (phase < 0.78)
-    nomPhase = "🌗 Dernier quartier";
-  else
-    nomPhase = "🌘 Dernier croissant";
+  let phase = "🌑 Nouvelle lune";
+  if (p < .03 || p >= .97) phase = "🌑 Nouvelle lune";
+  else if (p < .22) phase = "🌒 Premier croissant";
+  else if (p < .28) phase = "🌓 Premier quartier";
+  else if (p < .47) phase = "🌔 Gibbeuse croissante";
+  else if (p < .53) phase = "🌕 Pleine lune";
+  else if (p < .72) phase = "🌖 Gibbeuse décroissante";
+  else if (p < .78) phase = "🌗 Dernier quartier";
+  else phase = "🌘 Dernier croissant";
 
-  afficher("lune-phase", nomPhase);
+  afficher("lune-phase",phase);
   afficher("lune-eclairage",
-    Math.round(illumination.fraction * 100) + " %");
+    Math.round(info.fraction * 100) + " %");
 
-  // Calcul pour la date locale de Neuville-Saint-Rémy.
-  const parties = new Intl.DateTimeFormat("en-CA", {
+  const parties = new Intl.DateTimeFormat("en-CA",{
     timeZone: fuseau,
     year: "numeric",
     month: "2-digit",
     day: "2-digit"
   }).formatToParts(maintenant);
 
-  const valeur = type =>
-    Number(parties.find(p => p.type === type).value);
+  const nombre = type =>
+    Number(parties.find(x => x.type === type).value);
 
   const midi = new Date(Date.UTC(
-    valeur("year"), valeur("month") - 1, valeur("day"), 12
+    nombre("year"),nombre("month")-1,nombre("day"),12
   ));
 
   const horaires = SunCalc.getMoonTimes(
-    midi, latitude, longitude, true
+    midi,latitude,longitude,true
   );
 
-  afficher("lune-lever", heureLocale(horaires.rise));
-  afficher("lune-coucher", heureLocale(horaires.set));
+  afficher("lune-lever",heureLocale(horaires.rise));
+  afficher("lune-coucher",heureLocale(horaires.set));
 }
 
-// Actualisation automatique
+// Actualisation
 async function actualiserMeteo() {
   await Promise.all([
     lireMesure("temperature","temperature","°C"),
     lireMesure("humidite","humidite","%"),
     lireMesure("pression","pression","hPa"),
-    lirePrevisions()
+    lirePrevisions(),
+    lireArriveePluie()
   ]);
 
   lireLune();
-
   afficher("heure",
-    new Date().toLocaleTimeString("fr-FR", {
+    new Date().toLocaleTimeString("fr-FR",{
       timeZone: fuseau
     })
   );
 }
 
 actualiserMeteo();
-setInterval(actualiserMeteo, 60000);
-</script>
+lireSeismes();
 
+setInterval(actualiserMeteo,60000);
+setInterval(lireSeismes,900000);
+</script>
 </body>
 </html>
