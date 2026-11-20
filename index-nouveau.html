@@ -61,6 +61,16 @@ main {
   color: #125da0;
 }
 .pluie-carte { border: 3px solid #438ed1; }
+.pluie-etat { font-size: 24px; font-weight: 800; color: #125da0; margin: 10px 0; }
+.pluie-details { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:16px 0; }
+.pluie-detail { background:#eaf5ff; border-radius:14px; padding:14px 8px; }
+.pluie-detail .nom { font-size:14px; color:#34536b; }
+.pluie-detail .valeur { font-size:21px; font-weight:800; color:#125da0; margin-top:8px; }
+.pluie-grille { display:grid; grid-template-columns:repeat(24,minmax(0,1fr)); gap:3px; align-items:end; min-height:52px; margin-top:12px; }
+.pluie-barre { height:48px; border-radius:5px; background:#daecf7; position:relative; overflow:hidden; }
+.pluie-barre span { position:absolute; bottom:0; left:0; right:0; background:#227dc5; border-radius:4px; min-height:0; }
+.pluie-axe { display:flex; justify-content:space-between; font-size:12px; color:#43617d; }
+@media(max-width:400px) { .pluie-details { gap:7px; } .pluie-detail .valeur { font-size:18px; } }
 .danger-carte { border: 2px solid #e4a54f; }
 #seismes { text-align: left; }
 .seisme {
@@ -208,14 +218,26 @@ footer {
   </p>
 </section>
 
-<section class="carte pluie-carte">
-  <h2>☔ Dans combien de temps va-t-il pleuvoir ?</h2>
-  <p class="grand" id="pluie-arrivee">Chargement...</p>
+<section class="carte pluie-carte" aria-label="Prévisions de pluie">
+  <h2>🌧️ La pluie à Neuville-Saint-Rémy</h2>
+  <p class="pluie-etat" id="pluie-arrivee" aria-live="polite">Chargement des prévisions...</p>
   <p id="pluie-horaire"></p>
-  <p class="petit">
-    Estimation par tranches de 15 minutes sur les 6 prochaines heures.
-    Une averse peut arriver plus tôt ou plus tard.
-  </p>
+  <div class="pluie-details">
+    <div class="pluie-detail">
+      <div class="nom">🌤️ Fin de l'averse</div>
+      <div class="valeur" id="pluie-fin">—</div>
+    </div>
+    <div class="pluie-detail">
+      <div class="nom">☔ Retour de la pluie</div>
+      <div class="valeur" id="pluie-retour">—</div>
+    </div>
+  </div>
+  <p class="petit" id="pluie-delai"></p>
+  <strong>📊 Pluie prévue dans les 6 prochaines heures</strong>
+  <div class="pluie-grille" id="pluie-graphique" role="img" aria-label="Prévisions de pluie par quart d'heure"></div>
+  <div class="pluie-axe"><span>Maintenant</span><span>+3 h</span><span>+6 h</span></div>
+  <p class="petit" id="pluie-maj">Actualisation en cours...</p>
+  <p class="petit">Source : Open-Meteo. Prévisions par tranches de 15 minutes, non issues d'un radar en temps réel. Les horaires sont approximatifs et peuvent changer.</p>
 </section>
 
 <section class="carte danger-carte">
@@ -416,76 +438,116 @@ async function lirePrevisions() {
   }
 }
 
-// Arrivée de la pluie : tranches de 15 minutes
+// Prévisions de pluie à 15 minutes : début, fin et prochaine reprise.
+// Chaque valeur "rain" représente la quantité des 15 minutes précédentes.
 async function lireArriveePluie() {
   try {
-    const url =
-      "https://api.open-meteo.com/v1/forecast" +
-      "?latitude=50.18&longitude=3.22" +
-      "&minutely_15=rain" +
-      "&forecast_minutely_15=28" +
-      "&timeformat=unixtime" +
+    const url = "https://api.open-meteo.com/v1/forecast" +
+      "?latitude=" + latitude + "&longitude=" + longitude +
+      "&minutely_15=rain&past_minutely_15=2" +
+      "&forecast_minutely_15=30&timeformat=unixtime" +
       "&timezone=Europe%2FParis";
-
-    const reponse = await fetch(url);
-    if (!reponse.ok) throw new Error("Données indisponibles");
-    const donnees = await reponse.json();
-    const heures = donnees.minutely_15.time;
-    const valeurs = donnees.minutely_15.rain;
+    const reponse = await fetch(url, { cache: "no-store" });
+    if (!reponse.ok) throw new Error("Prévisions indisponibles");
+    const data = await reponse.json();
+    const heures = data.minutely_15?.time;
+    const valeurs = data.minutely_15?.rain;
+    if (!Array.isArray(heures) || !Array.isArray(valeurs) || !heures.length ||
+        heures.length !== valeurs.length) throw new Error("Données incomplètes");
 
     const maintenant = Date.now();
-    const fin = maintenant + 6 * 3600000;
-    let debut = null;
-    let enCours = false;
+    const limite = maintenant + 6 * 3600000;
+    // L'API date les cumuls de pluie à la FIN de leur tranche de 15 minutes.
+    const tranches = heures.map((h,i) => ({
+      debut: h * 1000 - 900000,
+      fin: h * 1000,
+      pluie: Number(valeurs[i]),
+      valide: valeurs[i] !== null && Number.isFinite(Number(valeurs[i]))
+    })).filter(x => x.fin > maintenant && x.debut < limite);
+    if (!tranches.length || !tranches.some(x => x.valide)) {
+      throw new Error("Aucune tranche disponible");
+    }
 
-    for (let i = 0; i < heures.length; i++) {
-      const instant = heures[i] * 1000;
-      const pluie = valeurs[i];
-
-      if (instant > fin) break;
-      if (pluie === null || pluie < 0.1) continue;
-
-      if (instant <= maintenant &&
-          instant + 900000 > maintenant) {
-        enCours = true;
-        break;
-      }
-
-      if (instant > maintenant) {
-        debut = instant;
-        break;
+    // Seuil de 0,1 mm par quart d'heure pour éviter les micro-traces.
+    const humide = x => x.valide && x.pluie >= 0.1;
+    const present = tranches.find(x => x.debut <= maintenant && x.fin > maintenant);
+    const pluieMaintenant = present ? humide(present) : false;
+    const episodes = [];
+    let episode = null;
+    for (const tranche of tranches) {
+      if (humide(tranche)) {
+        if (episode && tranche.debut <= episode.fin + 1000) {
+          episode.fin = tranche.fin;
+        } else {
+          episode = { debut: tranche.debut, fin: tranche.fin };
+          episodes.push(episode);
+        }
+      } else {
+        episode = null;
       }
     }
 
-    if (enCours) {
-      afficher("pluie-arrivee",
-        "🌧️ Pluie prévue actuellement");
-      afficher("pluie-horaire",
-        "Pense au parapluie ! ☂️");
-    } else if (debut !== null) {
-      const minutes =
-        Math.max(0,Math.round((debut - maintenant)/60000));
-      const h = Math.floor(minutes / 60);
-      const m = minutes % 60;
-      const delai = h > 0
-        ? h + " h " + String(m).padStart(2,"0")
-        : minutes + " minutes";
+    const premier = episodes[0] || null;
+    const suivant = pluieMaintenant ? (episodes[1] || null) : premier;
+    const delai = instant => {
+      const minutes = Math.max(0, Math.ceil((instant - maintenant) / 60000));
+      if (minutes < 60) return minutes + " min";
+      return Math.floor(minutes / 60) + " h " + String(minutes % 60).padStart(2,"0");
+    };
+    const horaire = instant => heureLocale(new Date(instant));
+    const finEpisode = ep => {
+      if (!ep) return "Aucune prévue";
+      if (ep.fin >= limite - 900000) return "Au-delà de 6 h";
+      return "Vers " + horaire(ep.fin);
+    };
 
-      afficher("pluie-arrivee",
-        "☔ Pluie prévue dans " + delai);
-      afficher("pluie-horaire",
-        "Vers " + heureLocale(new Date(debut)));
+    if (pluieMaintenant) {
+      afficher("pluie-arrivee", "🌧️ Pluie prévue en ce moment");
+      afficher("pluie-horaire", premier ? "Fin estimée : " + finEpisode(premier) : "Fin non disponible");
+      afficher("pluie-fin", finEpisode(premier));
+      afficher("pluie-retour", suivant ? "Vers " + horaire(suivant.debut) : "Aucune prévue");
+      afficher("pluie-delai", suivant ? "Nouvelle pluie dans " + delai(suivant.debut) :
+        "Pas de nouvelle averse prévue dans les 6 h après celle-ci.");
+    } else if (premier) {
+      afficher("pluie-arrivee", "☔ Pluie dans " + delai(premier.debut));
+      afficher("pluie-horaire", "Début estimé vers " + horaire(premier.debut));
+      afficher("pluie-fin", finEpisode(premier));
+      afficher("pluie-retour", "Vers " + horaire(premier.debut));
+      afficher("pluie-delai", episodes[1] ?
+        "Après cette averse, pluie de nouveau vers " + horaire(episodes[1].debut) :
+        "Aucune autre averse prévue ensuite dans la période consultée.");
     } else {
-      afficher("pluie-arrivee",
-        "🌤️ Pas de pluie prévue dans les 6 prochaines heures");
-      afficher("pluie-horaire",
-        "Selon les prévisions disponibles.");
+      afficher("pluie-arrivee", "🌤️ Pas de pluie prévue dans les 6 h");
+      afficher("pluie-horaire", "Temps sec selon les prévisions actuelles.");
+      afficher("pluie-fin", "Sans objet");
+      afficher("pluie-retour", "Aucune prévue");
+      afficher("pluie-delai", "La prévision sera réévaluée automatiquement.");
     }
-  } catch {
-    afficher("pluie-arrivee",
-      "Prévision indisponible");
-    afficher("pluie-horaire",
-      "Réessaie dans quelques minutes.");
+
+    const graphique = document.getElementById("pluie-graphique");
+    graphique.replaceChildren();
+    const premiers24 = tranches.slice(0,24);
+    for (const tranche of premiers24) {
+      const barre = document.createElement("div");
+      barre.className = "pluie-barre";
+      const niveau = document.createElement("span");
+      const hauteur = humide(tranche) ? Math.min(100, Math.max(8, tranche.pluie * 65)) : 0;
+      niveau.style.height = hauteur + "%";
+      barre.title = horaire(tranche.debut) + " : " +
+        (tranche.valide ? tranche.pluie + " mm" : "indisponible");
+      barre.appendChild(niveau);
+      graphique.appendChild(barre);
+    }
+    afficher("pluie-maj", "🔄 Prévisions mises à jour à " + horaire(new Date()) +
+      " · actualisation toutes les 5 min");
+  } catch (erreur) {
+    afficher("pluie-arrivee", "Prévisions de pluie indisponibles");
+    afficher("pluie-horaire", "Réessaie dans quelques minutes.");
+    afficher("pluie-fin", "—");
+    afficher("pluie-retour", "—");
+    afficher("pluie-delai", "Connexion au service météo impossible.");
+    afficher("pluie-maj", "⚠️ Actualisation impossible");
+    document.getElementById("pluie-graphique").replaceChildren();
   }
 }
 
@@ -611,8 +673,7 @@ async function actualiserMeteo() {
     lireMesure("temperature","temperature","°C"),
     lireMesure("humidite","humidite","%"),
     lireMesure("pression","pression","hPa"),
-    lirePrevisions(),
-    lireArriveePluie()
+    lirePrevisions()
   ]);
 
   lireLune();
@@ -624,9 +685,11 @@ async function actualiserMeteo() {
 }
 
 actualiserMeteo();
+lireArriveePluie();
 lireSeismes();
 
 setInterval(actualiserMeteo,60000);
+setInterval(lireArriveePluie,300000);
 setInterval(lireSeismes,900000);
 </script>
 </body>
